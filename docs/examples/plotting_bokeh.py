@@ -1,0 +1,12 @@
+import pandas as pd
+from bokeh.models import ColumnDataSource, HoverTool
+from bokeh.plotting import figure
+
+import pyreball as pb
+
+df = pd.DataFrame({"x": [1, 2, 3], "y": [4, 3, 6]})
+df["x"] = df["x"].astype(str)
+fig = figure(x_range=df["x"])
+fig.vbar(x="x", top="y", width=0.9, source=ColumnDataSource(data=df))
+fig.add_tools(HoverTool(tooltips=[("x", "@x"), ("y", "@y")]))
+pb.print_figure(fig, caption="Bokeh barchart.")

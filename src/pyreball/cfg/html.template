@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><!--PYREBALL_PAGE_TITLE--></title>
+<!--PYREBALL_HEAD_LINKS-->
+<style>
+<!--PYREBALL_CSS_DEFINITIONS-->
+
+/* Desktop-only Right Sidebar TOC Styles */
+.pyreball-sidebar-container {
+  min-height: 100vh;
+  font-family: var(--default-font, sans-serif);
+}
+
+.pyreball-sidebar {
+  /* 宽度自适应内容 */
+  width: auto;
+  min-width: 200px;
+  max-width: 320px;
+  background-color: var(--surface-color, #ffffff);
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  border-radius: 12px;
+  padding: 20px;
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  height: fit-content;
+  overflow-y: auto;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  transition: all 0.3s ease;
+  /* 防止内容过长时溢出 */
+  word-break: break-word;
+  overflow-wrap: break-word;
+  /* 拖拽相关样式 */
+  cursor: move;
+  user-select: none;
+  resize: none; /* 防止用户调整大小 */
+}
+
+/* 拖拽手柄样式 */
+.pyreball-sidebar::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  background-color: color-mix(in srgb, var(--default-color, #444444), transparent 70%);
+  border-radius: 2px;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.pyreball-sidebar:hover::before {
+  opacity: 1;
+}
+
+.pyreball-sidebar.dragging {
+  opacity: 0.9;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: none; /* 拖拽时禁用过渡动画 */
+}
+
+/* 居中的正文内容区域 */
+.pyreball-content {
+  max-width: 800px; /* 设置最大宽度 */
+  margin: 0 auto; /* 居中 */
+  padding: 40px 40px;
+  position: relative;
+  z-index: 1; /* 确保在侧边栏下方 */
+}
+
+/* 移除之前的内容区域边距设置 */
+.pyreball-content::before {
+  display: none;
+}
+
+.pyreball-toc {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.pyreball-toc li {
+  margin-bottom: 6px;
+  position: relative;
+}
+
+.pyreball-toc a {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  color: var(--default-color, #444444);
+  text-decoration: none;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  border-right: 3px solid transparent;
+  border-left: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer; /* 链接的指针样式 */
+}
+
+/* 拖拽时禁用链接悬停效果 */
+.pyreball-sidebar:not(.dragging) .pyreball-toc a:hover {
+  white-space: normal;
+  word-break: break-word;
+}
+
+.pyreball-sidebar:not(.dragging) .pyreball-toc a:hover {
+  background-color: color-mix(in srgb, var(--accent-color, #34b7a7), transparent 90%);
+  color: var(--accent-color, #34b7a7);
+  border-right-color: var(--accent-color, #34b7a7);
+  border-color: color-mix(in srgb, var(--accent-color, #34b7a7), transparent 70%);
+  transform: translateX(-3px);
+}
+
+.pyreball-toc a.active {
+  background-color: color-mix(in srgb, var(--accent-color, #34b7a7), transparent 85%);
+  color: var(--accent-color, #34b7a7);
+  border-right-color: var(--accent-color, #34b7a7);
+  border-color: color-mix(in srgb, var(--accent-color, #34b7a7), transparent 50%);
+  font-weight: 500;
+}
+
+.toc-children {
+  list-style: none;
+  padding-left: 20px;
+  margin: 5px 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  border-left: 1px dashed color-mix(in srgb, var(--default-color, #444444), transparent 70%);
+  border-radius: 0 0 0 8px;
+}
+
+.toc-has-children.expanded > .toc-children {
+  max-height: 1000px;
+}
+
+/* 各级标题的缩进和样式 */
+.pyreball-toc .toc-h2 {
+  padding-left: 20px;
+  font-size: 13.5px;
+}
+
+.pyreball-toc .toc-h3 {
+  padding-left: 35px;
+  font-size: 13px;
+  color: color-mix(in srgb, var(--default-color, #444444), transparent 20%);
+}
+
+.pyreball-toc .toc-h4 {
+  padding-left: 50px;
+  font-size: 12.5px;
+  color: color-mix(in srgb, var(--default-color, #444444), transparent 30%);
+}
+
+.pyreball-toc .toc-h5 {
+  padding-left: 65px;
+  font-size: 12px;
+  color: color-mix(in srgb, var(--default-color, #444444), transparent 40%);
+}
+
+.pyreball-toc .toc-h6 {
+  padding-left: 80px;
+  font-size: 11.5px;
+  color: color-mix(in srgb, var(--default-color, #444444), transparent 50%);
+}
+
+/* Back to top button */
+.pyreball-back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: var(--accent-color, #34b7a7);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 99;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 2px solid white;
+}
+
+.pyreball-back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.pyreball-back-to-top:hover {
+  background-color: var(--accent-dark, #2a9587);
+  transform: translateY(-3px);
+  border-color: var(--accent-color, #34b7a7);
+}
+
+/* Adjust main container for sidebar layout */
+.pyreball-main-container {
+  width: 100% !important;
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+  background-color: transparent;
+}
+
+/* 侧边栏滚动条样式 */
+.pyreball-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pyreball-sidebar::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--default-color, #444444), transparent 90%);
+  border-radius: 3px;
+}
+
+.pyreball-sidebar::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--default-color, #444444), transparent 60%);
+  border-radius: 3px;
+}
+
+.pyreball-sidebar::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--default-color, #444444), transparent 40%);
+}
+</style>
+</head>
+<body>
+<div class="pyreball-sidebar-container">
+  <main class="pyreball-content">
+    <div class="pyreball-main-container">
+      <!--PYREBALL_REPORT_CONTENTS-->
+    </div>
+  </main>
+  
+  <aside class="pyreball-sidebar" id="sidebar">
+    <nav class="pyreball-toc" id="tableOfContents">
+      <div class="toc-loading">正在生成目录...</div>
+    </nav>
+  </aside>
+</div>
+
+<a href="#" class="pyreball-back-to-top" id="backToTop">
+  <span>↑</span>
+</a>
+
+<script>
+// Table of Contents Generation with collapsible support
+document.addEventListener('DOMContentLoaded', function() {
+  const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+  const tocContainer = document.getElementById('tableOfContents');
+  const sidebar = document.getElementById('sidebar');
+  
+  if (headings.length > 0) {
+    // Build a tree structure first
+    const tree = [];
+    const stack = [];
+    
+    headings.forEach((heading, index) => {
+      if (!heading.id) {
+        heading.id = 'section-' + index;
+      }
+      
+      const level = parseInt(heading.tagName.substring(1));
+      const text = heading.textContent.replace(/¶/g, '').trim();
+      const id = heading.id;
+      
+      const node = {
+        level: level,
+        text: text,
+        id: id,
+        children: []
+      };
+      
+      // Find parent in stack
+      while (stack.length > 0 && stack[stack.length - 1].level >= level) {
+        stack.pop();
+      }
+      
+      if (stack.length === 0) {
+        tree.push(node);
+      } else {
+        stack[stack.length - 1].children.push(node);
+      }
+      
+      stack.push(node);
+    });
+    
+    // Convert tree to HTML
+    function buildTOCHTML(nodes) {
+      let html = '';
+      
+      nodes.forEach((node) => {
+        const hasChildren = node.children.length > 0;
+        
+        let tocClass = '';
+        if (node.level === 1) tocClass = 'toc-h1';
+        else if (node.level === 2) tocClass = 'toc-h2';
+        else if (node.level === 3) tocClass = 'toc-h3';
+        else if (node.level === 4) tocClass = 'toc-h4';
+        else if (node.level === 5) tocClass = 'toc-h5';
+        else if (node.level === 6) tocClass = 'toc-h6';
+        
+        if (hasChildren) {
+          html += `
+            <li class="toc-has-children ${tocClass}" data-level="${node.level}">
+              <a href="#${node.id}" title="${node.text}">
+                ${node.text}
+              </a>
+              <ul class="toc-children">
+                ${buildTOCHTML(node.children)}
+              </ul>
+            </li>
+          `;
+        } else {
+          html += `
+            <li class="${tocClass}" data-level="${node.level}">
+              <a href="#${node.id}" title="${node.text}">
+                ${node.text}
+              </a>
+            </li>
+          `;
+        }
+      });
+      
+      return html;
+    }
+    
+    const tocHTML = buildTOCHTML(tree);
+    tocContainer.innerHTML = tocHTML;
+    
+    // Calculate and set sidebar width based on content
+    function calculateAndSetSidebarWidth() {
+      const tocLinks = tocContainer.querySelectorAll('a');
+      let maxWidth = 200; // 最小宽度
+      
+      // 临时创建一个隐藏元素来测量文本宽度
+      const tempSpan = document.createElement('span');
+      tempSpan.style.visibility = 'hidden';
+      tempSpan.style.position = 'absolute';
+      tempSpan.style.whiteSpace = 'nowrap';
+      tempSpan.style.fontSize = '14px';
+      tempSpan.style.fontFamily = 'inherit';
+      document.body.appendChild(tempSpan);
+      
+      // 测量所有链接的文本宽度
+      tocLinks.forEach(link => {
+        const text = link.textContent || link.innerText;
+        tempSpan.textContent = text;
+        
+        // 根据标题级别添加缩进
+        let indent = 0;
+        const li = link.closest('li');
+        if (li) {
+          if (li.classList.contains('toc-h2')) indent = 20;
+          else if (li.classList.contains('toc-h3')) indent = 35;
+          else if (li.classList.contains('toc-h4')) indent = 50;
+          else if (li.classList.contains('toc-h5')) indent = 65;
+          else if (li.classList.contains('toc-h6')) indent = 80;
+        }
+        
+        const textWidth = tempSpan.offsetWidth + indent + 40;
+        
+        if (textWidth > maxWidth) {
+          maxWidth = Math.min(textWidth, 320);
+        }
+      });
+      
+      document.body.removeChild(tempSpan);
+      
+      // 设置侧边栏宽度
+      sidebar.style.width = `${maxWidth}px`;
+    }
+    
+    // 初始化展开状态
+    const h1Items = document.querySelectorAll('.toc-has-children.toc-h1');
+    if (h1Items.length > 0) {
+      h1Items[0].classList.add('expanded');
+      const firstH1Id = h1Items[0].querySelector('a').getAttribute('href');
+      localStorage.setItem(`pyreball-toc-${firstH1Id}`, 'true');
+      
+      for (let i = 1; i < h1Items.length; i++) {
+        h1Items[i].classList.remove('expanded');
+        const otherH1Id = h1Items[i].querySelector('a').getAttribute('href');
+        localStorage.setItem(`pyreball-toc-${otherH1Id}`, 'false');
+      }
+    }
+    
+    // 计算并设置侧边栏宽度
+    calculateAndSetSidebarWidth();
+    
+    // 监听窗口大小变化，重新计算侧边栏宽度
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(calculateAndSetSidebarWidth, 250);
+    });
+  } else {
+    tocContainer.innerHTML = '<div class="toc-empty">暂无章节标题</div>';
+  }
+  
+  // TOC链接点击处理
+  document.querySelectorAll('.pyreball-toc a').forEach(link => {
+    link.addEventListener('click', function(e) {
+      // 如果正在拖拽，不执行链接点击
+      if (sidebar.classList.contains('dragging')) {
+        e.preventDefault();
+        return;
+      }
+      
+      e.preventDefault();
+      
+      const targetId = this.getAttribute('href');
+      const targetElement = document.querySelector(targetId);
+      const parentLi = this.closest('li');
+      const isParentItem = parentLi.classList.contains('toc-has-children');
+      
+      // 查找h1祖先元素
+      let h1Ancestor = null;
+      let currentElement = parentLi;
+      while (currentElement) {
+        if (currentElement.classList.contains('toc-h1')) {
+          h1Ancestor = currentElement;
+          break;
+        }
+        currentElement = currentElement.parentElement.closest('li');
+      }
+      
+      // 处理h1项的折叠效果
+      if (h1Ancestor) {
+        // 折叠所有其他h1项
+        document.querySelectorAll('.toc-has-children.toc-h1.expanded').forEach(otherItem => {
+          if (otherItem !== h1Ancestor) {
+            otherItem.classList.remove('expanded');
+            const otherItemId = otherItem.querySelector('a').getAttribute('href');
+            localStorage.setItem(`pyreball-toc-${otherItemId}`, 'false');
+          }
+        });
+        
+        // 展开点击的h1项
+        if (!h1Ancestor.classList.contains('expanded')) {
+          h1Ancestor.classList.add('expanded');
+          const h1Id = h1Ancestor.querySelector('a').getAttribute('href');
+          localStorage.setItem(`pyreball-toc-${h1Id}`, 'true');
+        }
+        
+        // 处理非h1的父项
+        if (isParentItem && parentLi !== h1Ancestor) {
+          parentLi.classList.toggle('expanded');
+          localStorage.setItem(`pyreball-toc-${targetId}`, parentLi.classList.contains('expanded'));
+        }
+      } else if (isParentItem) {
+        parentLi.classList.toggle('expanded');
+        localStorage.setItem(`pyreball-toc-${targetId}`, parentLi.classList.contains('expanded'));
+      }
+      
+      // 平滑滚动到目标位置
+      if (targetElement) {
+        window.scrollTo({
+          top: targetElement.offsetTop - 20,
+          behavior: 'smooth'
+        });
+        
+        history.pushState(null, null, targetId);
+      }
+    });
+    
+    // 加载保存的状态
+    const parentLi = link.closest('.toc-has-children');
+    if (parentLi) {
+      const itemId = link.getAttribute('href');
+      const savedState = localStorage.getItem(`pyreball-toc-${itemId}`);
+      if (savedState === 'true') {
+        parentLi.classList.add('expanded');
+      } else if (savedState === 'false') {
+        parentLi.classList.remove('expanded');
+      }
+    }
+  });
+  
+  // 高亮当前章节
+  function highlightCurrentSection() {
+    const sections = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    const tocLinks = document.querySelectorAll('.pyreball-toc a');
+    
+    let currentSectionId = '';
+    let scrollPosition = window.scrollY + 100;
+    
+    sections.forEach(section => {
+      if (section.offsetTop <= scrollPosition) {
+        currentSectionId = section.id;
+      }
+    });
+    
+    tocLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + currentSectionId) {
+        link.classList.add('active');
+      }
+    });
+  }
+  
+  // 返回顶部按钮
+  const backToTop = document.getElementById('backToTop');
+  
+  function updateBackToTop() {
+    if (window.scrollY > 500) {
+      backToTop.classList.add('visible');
+    } else {
+      backToTop.classList.remove('visible');
+    }
+    
+    highlightCurrentSection();
+  }
+  
+  window.addEventListener('scroll', updateBackToTop);
+  updateBackToTop();
+  
+  if (backToTop) {
+    backToTop.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
+  
+  // 侧边栏拖拽功能
+  let isDragging = false;
+  let dragStartX, dragStartY;
+  let sidebarStartX, sidebarStartY;
+  
+  sidebar.addEventListener('mousedown', startDrag);
+  
+  function startDrag(e) {
+    // 确保不是点击了链接
+    if (e.target.tagName === 'A' || e.target.closest('a')) {
+      return;
+    }
+    
+    isDragging = true;
+    sidebar.classList.add('dragging');
+    
+    // 记录初始位置
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    
+    const sidebarRect = sidebar.getBoundingClientRect();
+    sidebarStartX = sidebarRect.right;
+    sidebarStartY = sidebarRect.top;
+    
+    // 添加事件监听器
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', stopDrag);
+    
+    // 防止文本选择
+    e.preventDefault();
+  }
+  
+  function onDrag(e) {
+    if (!isDragging) return;
+    
+    // 计算移动距离
+    const deltaX = e.clientX - dragStartX;
+    const deltaY = e.clientY - dragStartY;
+    
+    // 计算新位置
+    const newRight = window.innerWidth - (sidebarStartX + deltaX);
+    const newTop = sidebarStartY + deltaY;
+    
+    // 限制在视口内
+    const maxRight = window.innerWidth - sidebar.offsetWidth - 10;
+    const minRight = 10;
+    const maxTop = window.innerHeight - sidebar.offsetHeight - 10;
+    const minTop = 10;
+    
+    const constrainedRight = Math.max(minRight, Math.min(maxRight, newRight));
+    const constrainedTop = Math.max(minTop, Math.min(maxTop, newTop));
+    
+    // 应用新位置
+    sidebar.style.right = `${constrainedRight}px`;
+    sidebar.style.top = `${constrainedTop}px`;
+  }
+  
+  function stopDrag() {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    sidebar.classList.remove('dragging');
+    
+    // 移除事件监听器
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', stopDrag);
+    
+    // 保存位置到本地存储
+    const sidebarRect = sidebar.getBoundingClientRect();
+    localStorage.setItem('pyreball-sidebar-position', JSON.stringify({
+      right: window.innerWidth - sidebarRect.right,
+      top: sidebarRect.top
+    }));
+  }
+  
+  // 加载保存的位置
+  const savedPosition = localStorage.getItem('pyreball-sidebar-position');
+  if (savedPosition) {
+    try {
+      const position = JSON.parse(savedPosition);
+      // 确保位置在视口内
+      const maxRight = window.innerWidth - sidebar.offsetWidth - 10;
+      const minRight = 10;
+      const maxTop = window.innerHeight - sidebar.offsetHeight - 10;
+      const minTop = 10;
+      
+      const constrainedRight = Math.max(minRight, Math.min(maxRight, position.right));
+      const constrainedTop = Math.max(minTop, Math.min(maxTop, position.top));
+      
+      sidebar.style.right = `${constrainedRight}px`;
+      sidebar.style.top = `${constrainedTop}px`;
+    } catch (e) {
+      console.error('Failed to parse saved sidebar position:', e);
+    }
+  }
+});
+</script>
+<!--PYREBALL_INLINE_HIGHLIGHT_SCRIPT-->
+</body>
+</html>

@@ -1,0 +1,72 @@
+# Changelog
+
+## 2.2.1 (2025-10-10)
+
+- Fix parsing of headings when constructing the table of contents, so heading tags
+  inside regular content (e.g., table cells) are ignored.
+- Add tests for Python 3.13.
+
+## 2.2.0 (2024-06-22)
+
+- Added support for Seaborn's `PairGrid`, `FacetGrid`, `JointGrid`, and `ClusterGrid`.
+
+## 2.1.2 (2024-06-01)
+
+- Version of installed `bokeh` package is now used to create matching JavaScript links.
+- Fixed invalid link in Configuration page of documentation.
+
+## 2.1.1 (2024-06-01)
+
+- Fixed logging by replacing custom logger creation with standard `getLogger` call. The
+  logging won't break user's logging configuration anymore.
+
+## 2.1.0 (2024-04-15)
+
+- Added support for Python 3.12.
+- Fixed erroneous highlighting behaviour for `code`, `code_block` and `print_code_block`
+  functions when `None` value was used for `syntax_highlight` parameter.
+- Arbitrary string value can be now passed to `syntax_highlight` parameter
+  of `code`, `code_block` and `print_code_block` functions. This allows to use languages
+  supported by Highlight.js library.
+- Internals:
+    - Replaced with `setup.py` with `pyproject.toml` and Poetry, moved source code
+      under `src` directory.
+    - Dependency on `pkg_resources` replaced with `importlib` for Python >= 3.9.
+    - Ruff is now used for linting and formatting.
+    - Added missing `py.typed` file.
+
+## 2.0.0 (2023-11-15)
+
+- Added option `-m` to specify input as module.
+- Changed the behaviour of CLI options to allow usage of `-m` together with script
+  arguments. Now the script arguments must be always passed after `--`.
+- Added example with custom script argument to documentation.
+
+## 1.0.0 (2023-09-19)
+
+- Created documentation at readthedocs.
+- Replaced `print_html()` function with `print()`.
+- Replaced `print_code()` function with `print_code_block()`.
+- Replaced `plot_graph()` with `print_figure()`.
+- Removed `plot_multi_graph`. An example how to achieve the same is now in docs.
+- Replaced code-prettify with highlight.js for code blocks.
+- `print_h1`, ..., `print_h6` functions can now take a `Reference` object.
+- Added new text elements `div()`, `span()`, `code()`, `code_block()`, `a()`,
+  and `tag()`.
+  Replaced `ol()` and `ul()` with `olist()` and `ulist()`.
+- Added new parameters to almost all HTML elements - in particular parameters `cl`
+  and `attrs`.
+- Updated various CLI arguments and config parameters.
+- Updated template and config files.
+- Updated support for newer versions of 3rd party dependencies in examples.
+
+## 0.1.1 (2021-09-14)
+
+- Added `replace_newlines_with_br` parameter to `print_div` to control replacement of
+  newline characters.
+- It is newly possible to pass custom script arguments.
+- Replaced `--output-dir` parameter with `--output-path` parameter.
+
+## 0.1.0 (2021-09-02)
+
+- Initial version moved to GitHub.
