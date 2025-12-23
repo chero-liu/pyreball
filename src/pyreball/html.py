@@ -1232,3 +1232,252 @@ def print_figure(
         matplotlib_format=matplotlib_format,
         embedded=embedded,
     )
+
+
+def print_image_selector(
+    directory_path: str,
+    caption: Optional[str] = None,
+    reference: Optional[Reference] = None,
+    align: Optional[str] = None,
+    caption_position: Optional[str] = None,
+    numbered: Optional[bool] = None,
+    image_extensions: Optional[List[str]] = None,
+    default_image: Optional[str] = None,
+    embed_images: Optional[bool] = None,
+) -> None:
+    """
+    Print an interactive image selector that allows users to choose images from a directory.
+
+    This function creates an interactive component with a dropdown selector
+    that lets users choose any image from the specified directory.
+    The selected image is displayed dynamically using JavaScript.
+
+    Args:
+        directory_path: Path to the directory containing images.
+        caption: Caption of the image selector.
+        reference: Reference object for link creation.
+        align: How to align the component horizontally.
+            Acceptable values are `'left'`, `'center'`, and `'right'`.
+            Defaults to settings from config or CLI arguments if `None`.
+        caption_position: Where to place the caption.
+            Acceptable values are `'top'`, and `'bottom'`.
+            Defaults to settings from config or CLI arguments if `None`.
+        numbered: Whether the caption should be numbered.
+            Defaults to settings from config or CLI arguments if `None`.
+        image_extensions: List of image file extensions to include.
+            Defaults to `['.png', '.jpg', '.jpeg', '.gif', '.svg', '.bmp', '.tiff', '.webp']`.
+        default_image: Default image to display when the page loads.
+            If `None`, the first image in the directory is used.
+    """
+    import os
+    import shutil
+    from pathlib import Path
+
+    # Set default values
+    if image_extensions is None:
+        image_extensions = [
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".gif",
+            ".svg",
+            ".bmp",
+            ".tiff",
+            ".webp",
+        ]
+
+    # Get alignment and caption settings
+    align = cast(
+        str,
+        merge_values(
+            primary_value=align, secondary_value=get_parameter_value("align_figures")
+        ),
+    )
+    caption_position = cast(
+        str,
+        merge_values(
+            primary_value=caption_position,
+            secondary_value=get_parameter_value("figure_captions_position"),
+        ),
+    )
+    numbered = bool(
+        merge_values(
+            primary_value=numbered,
+            secondary_value=get_parameter_value("numbered_figures"),
+        )
+    )
+
+    # Get figure index for numbering
+    if "fig_index" not in _graph_memory:
+        _graph_memory["fig_index"] = 1
+    fig_index = _graph_memory["fig_index"]
+
+    # Create anchor link for reference
+    anchor_link = _construct_image_anchor_link(reference=reference, fig_index=fig_index)
+
+    # Scan directory for image files
+    dir_path = Path(directory_path)
+    image_files = []
+    if dir_path.exists() and dir_path.is_dir():
+        for ext in image_extensions:
+            image_files.extend(list(dir_path.glob(f"*{ext}")))
+            image_files.extend(list(dir_path.glob(f"*{ext.upper()}")))
+
+    # Sort image files alphabetically
+    image_files.sort()
+
+    # Prepare image data with copied files
+    html_dir_path = get_parameter_value("html_dir_path")
+    html_dir_name = get_parameter_value("html_dir_name")
+
+    image_data = []
+    if html_dir_path and html_dir_name:
+        # Ensure HTML directory exists
+        make_sure_dir_exists(html_dir_path)
+
+        # Create a subdirectory for these images
+        img_subdir = f"image_selector_{fig_index}"
+        img_dir_path = os.path.join(html_dir_path, img_subdir)
+        os.makedirs(img_dir_path, exist_ok=True)
+
+        # Copy images to HTML directory
+        for img_file in image_files:
+            try:
+                # Generate unique filename
+                dest_filename = f"{fig_index:03d}_{img_file.name}"
+                dest_path = os.path.join(img_dir_path, dest_filename)
+
+                # Copy the image file
+                shutil.copy2(img_file, dest_path)
+
+                # Store relative path for HTML
+                rel_path = os.path.join(html_dir_name, img_subdir, dest_filename)
+                image_data.append(
+                    {
+                        "name": img_file.name,
+                        "path": rel_path,
+                        "original_path": str(img_file),
+                    }
+                )
+            except Exception as e:
+                print(f"Warning: Failed to copy image {img_file.name}: {e}")
+    else:
+        # If no HTML directory is set, use absolute paths (may not work in browser)
+        for img_file in image_files:
+            image_data.append(
+                {
+                    "name": img_file.name,
+                    "path": str(img_file),
+                    "original_path": str(img_file),
+                }
+            )
+
+    # Prepare caption element
+    caption_element = _prepare_caption_element(
+        prefix="Figure",
+        caption=caption,
+        numbered=numbered,
+        index=fig_index,
+        anchor_link=anchor_link,
+    )
+
+    # Create HTML for image selector
+    selector_id = f"image-selector-{fig_index}"
+    image_container_id = f"image-container-{fig_index}"
+
+    # Create options HTML
+    options_html = ""
+    for i, img_data in enumerate(image_data):
+        selected = (
+            "selected"
+            if (default_image and img_data["name"] == default_image)
+            or (i == 0 and not default_image)
+            else ""
+        )
+        options_html += (
+            f'<option value="{img_data["path"]}" {selected}>{img_data["name"]}</option>'
+        )
+
+    # Create the HTML component
+    html_content = f"""
+<div class="pyreball-image-selector-wrapper" align="{align}">
+    <div class="pyreball-image-selector-controls">
+        <label for="{selector_id}">Select image: </label>
+        <select id="{selector_id}" class="pyreball-image-selector" onchange="updateSelectedImage('{selector_id}', '{image_container_id}')">
+            {options_html}
+        </select>
+    </div>
+    <div id="{image_container_id}" class="pyreball-image-container">
+        {f'<img src="{image_data[0]["path"] if image_data else ""}" alt="Selected image" class="pyreball-selected-image">' if image_data else '<p>No images found in directory.</p>'}
+    </div>
+</div>
+"""
+
+    # Add JavaScript for interactivity
+    js_code = """
+<script>
+function updateSelectedImage(selectorId, containerId) {
+    const selector = document.getElementById(selectorId);
+    const container = document.getElementById(containerId);
+    const selectedValue = selector.value;
+    
+    // Update image
+    container.innerHTML = `<img src="${selectedValue}" alt="Selected image" class="pyreball-selected-image">`;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all image selectors
+    const selectors = document.querySelectorAll('.pyreball-image-selector');
+    selectors.forEach(selector => {
+        const containerId = selector.id.replace('image-selector-', 'image-container-');
+        updateSelectedImage(selector.id, containerId);
+    });
+});
+</script>
+"""
+
+    # Combine HTML and JavaScript
+    full_html = html_content + js_code
+
+    # Wrap with caption based on position
+    if caption_position == "top":
+        full_html = caption_element + full_html
+    else:
+        full_html = full_html + caption_element
+
+    # Write to HTML file
+    html_file_path = get_parameter_value("html_file_path")
+    if not html_file_path and html_dir_path:
+        # If html_file_path is not set but html_dir_path is, construct the path
+        html_file_path = os.path.join(
+            html_dir_path, os.path.basename(html_dir_path) + ".html"
+        )
+
+    if html_file_path and os.path.exists(os.path.dirname(html_file_path)):
+        # Directly write to HTML file
+        try:
+            with open(html_file_path, "a") as f:
+                f.write(full_html)
+                f.write("\n")
+            _graph_memory["fig_index"] += 1
+        except Exception as e:
+            print(f"Warning: Failed to write to HTML file {html_file_path}: {e}")
+    elif html_file_path:
+        print(
+            f"Warning: HTML directory does not exist: {os.path.dirname(html_file_path)}"
+        )
+
+    # Also print to stdout if needed
+    if not html_file_path or get_parameter_value("keep_stdout"):
+        builtins.print(f"Image selector for directory: {directory_path}")
+        if caption:
+            builtins.print(f"Caption: {caption}")
+        if image_data:
+            builtins.print(f"Found {len(image_data)} images in directory.")
+            if html_dir_path:
+                builtins.print(
+                    f"Images copied to: {os.path.join(html_dir_path, f'image_selector_{fig_index}')}"
+                )
+        else:
+            builtins.print("No images found in directory.")

@@ -1,391 +1,107 @@
-/* Pyreball CSS Template - Kelly Style Professional Academic Design */
-/* Based on Kelly Bootstrap Template: https://bootstrapmade.com/kelly-free-bootstrap-cv-resume-html-template/ */
+/* 
+ * Pyreball CSS 模板文件
+ * 此文件包含Pyreball报告系统使用的CSS样式
+ * 变量使用双花括号表示，如{{page_width}}，将在生成报告时替换
+ */
 
-/* Font & Color Variables */
-:root {
-  --default-font: "Times New Roman", "Roboto", system-ui, sans-serif;
-  --heading-font: "Times New Roman", "Raleway", sans-serif;
-  --code-font: "Monaco", "Menlo", "Consolas", monospace;
-  --background-color: #ffffff;
-  --surface-color: #ffffff;
-  --default-color: #333333;
-  --heading-color: #000000;
-  --accent-color: rgb(0, 63, 127);
-  --accent-light: color-mix(in srgb, var(--accent-color), transparent 85%);
-  --accent-dark: color-mix(in srgb, var(--accent-color), black 30%);
-  --border-color: color-mix(in srgb, var(--default-color), transparent 80%);
-  --border-light: color-mix(in srgb, var(--default-color), transparent 90%);
-  --shadow-color: rgba(0, 0, 0, 0.08);
-  scroll-behavior: smooth;
-}
-
-/* General Styling */
+/* 基础页面样式 */
 body {
-  color: var(--default-color);
-  background-color: var(--background-color);
-  font-family: var(--default-font);
-  line-height: 1.5;
-  margin: 0;
-  padding: 20px;
-  font-size: 12pt;
+    font-family:"Times New Roman"; /* 可修改：更改页面默认字体 */
 }
 
-a {
-  color: var(--accent-color);
-  text-decoration: none;
-  transition: 0.3s;
-}
-
-a:hover {
-  color: color-mix(in srgb, var(--accent-color), transparent 25%);
-}
-
-/* Main Container */
+/* 主容器 - 控制报告整体宽度 */
 .pyreball-main-container {
-  width: {{page_width}}%;
-  margin: 0 auto;
-  background-color: var(--surface-color);
-  padding: 40px;
-  box-shadow: 0px 0 18px var(--shadow-color);
-  border-radius: 8px;
-  transition: all 0.5s;
+    width: {{page_width}}%; /* 模板变量：页面宽度百分比，可在配置中调整 */
+    margin-left: auto;
+    margin-right: auto; /* 水平居中 */
 }
 
-/* Headings */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--heading-color);
-  font-family: var(--heading-font);
-  font-weight: 600;
-  position: relative;
-  font-style: normal;
+/* 图片包装器 - 控制图片的边距 */
+.pyreball-image-wrapper {
+    margin-left: auto;
+    margin-right: auto; /* 水平居中 */
+    margin-top: 20px;    /* 可修改：调整图片上边距 */
+    margin-bottom: 20px; /* 可修改：调整图片下边距 */
 }
 
-h1 { font-size: 16pt; font-weight: 700; margin: 2em 0 1em; padding-bottom: 15px; }
-h2 { font-size: 14pt; margin: 1.5em 0 0.8em; padding-bottom: 10px; }
-h3 { font-size: 12pt; margin: 1.2em 0 0.6em; padding-bottom: 8px; }
-h4 { font-size: 11pt; text-indent: 1em; margin: 1em 0 0.5em; }
-h5 { font-size: 10.5pt; color: color-mix(in srgb, var(--heading-color), transparent 20%); margin: 0.8em 0 0.4em; }
-h6 { font-size: 10pt; color: color-mix(in srgb, var(--heading-color), transparent 40%); margin: 0.6em 0 0.3em; }
-
-/* Heading underlines */
-h1:after { content: ""; position: absolute; width: 100%; height: 1px; background: var(--border-color); left: 0; bottom: 0; }
-h2:after { content: ""; position: absolute; width: 80%; height: 1px; background: var(--border-light); left: 0; bottom: 0; }
-h3:after { content: ""; position: absolute; width: 60%; height: 1px; background: var(--border-light); left: 0; bottom: 0; }
-
-/* Anchor links */
-a.pyreball-anchor-link {
-  text-decoration: none;
-  padding: 0 15px;
-  opacity: 0;
-  color: var(--accent-color);
-  transition: 0.3s;
-  font-style: normal;
+/* 媒体元素居中 - 图片、SVG、Vega图表等 */
+img, svg, canvas.marks, div.vega-embed {
+    margin-left: auto;
+    margin-right: auto; /* 水平居中 */
+    display: block;     /* 确保块级显示 */
 }
 
-a.pyreball-anchor-link:hover { color: var(--accent-dark); }
+/* 文本居中类 */
+.pyreball-text-centered {
+    text-align: center; /* 文本水平居中 */
+}
+
+/* 表格和代码块包装器 - 控制间距 */
+.pyreball-table-wrapper, .pyreball-code-wrapper
+{
+    width: 100%;        /* 占满可用宽度 */
+    margin-top: 30px;   /* 可修改：调整上边距 */
+    margin-bottom: 30px; /* 可修改：调整下边距 */
+}
+
+/* 自适应宽度块 - 根据内容调整宽度 */
+.pyreball-block-fit-content {
+    width: fit-content;  /* 宽度适应内容 */
+    max-width: 100%;     /* 最大宽度不超过容器 */
+    margin-top: 10px;    /* 可修改：调整上边距 */
+    margin-bottom: 10px; /* 可修改：调整下边距 */
+}
+
+/* 居中对齐类 */
+.pyreball-centered {
+    margin-left:auto;
+    margin-right:auto;   /* 水平居中 */
+}
+
+/* 左对齐类 */
+.pyreball-left-aligned {
+    margin-left:0px;     /* 左边缘对齐 */
+    margin-right:auto;
+}
+
+/* 右对齐类 */
+.pyreball-right-aligned {
+    margin-left:auto;
+    margin-right:0px;    /* 右边缘对齐 */
+}
+
+/* 
+ * DataTables 对齐修复
+ * 针对带有搜索框的窄表格进行对齐修复
+ */
+.dataTables_scroll {
+    width: fit-content;  /* 宽度适应内容 */
+    max-width: 100%;     /* 最大宽度不超过容器 */
+    margin-left:auto;
+    margin-right:auto;   /* 水平居中 */
+}
+
+/* 锚链接样式 - 用于标题内的锚点链接 */
+a.pyreball-anchor-link:link {
+    text-decoration: none; /* 去除下划线 */
+    padding: 0px 20px;     /* 可修改：调整内边距 */
+    opacity: 0;            /* 默认隐藏 */
+}
+
+/* 超链接颜色设置 */
+a[href]:link, a[href]:visited {
+    color: #296eaa;        /* 可修改：更改链接颜色 */
+}
+a[href]:hover {
+    color: #001f3f         /* 可修改：更改鼠标悬停颜色 */
+}
+
+/* 标题悬停时显示锚链接 */
 h1:hover .pyreball-anchor-link,
 h2:hover .pyreball-anchor-link,
 h3:hover .pyreball-anchor-link,
 h4:hover .pyreball-anchor-link,
 h5:hover .pyreball-anchor-link,
 h6:hover .pyreball-anchor-link {
-  opacity: 1;
-}
-
-/* Links */
-a[href] {
-  color: var(--accent-color);
-  text-decoration: none;
-  border-bottom: 1px dotted var(--accent-light);
-  transition: 0.3s;
-  font-style: normal;
-}
-
-a[href]:hover {
-  color: var(--accent-dark);
-  border-bottom: 1px solid var(--accent-color);
-}
-
-/* Text Alignment */
-.pyreball-text-centered {
-  text-align: center;
-  color: color-mix(in srgb, var(--default-color), transparent 40%);
-  font-style: italic;
-  margin: 20px 0;
-  padding: 10px 0;
-  border-top: 1px solid var(--border-light);
-  border-bottom: 1px solid var(--border-light);
-}
-
-/* Paragraph Styles */
-p { line-height: 1.5; margin: 0.8em 0; font-style: normal; }
-p.paragraph { text-indent: 2em; }
-p.center { text-align: center; }
-p.name_fig, p.premark, p.tremark { font-size: 0.9em; line-height: 1.5; font-style: normal; }
-p.name_fig { text-align: center; margin: 0 2em; color: #000000; }
-p.premark { text-align: center; margin: 0 4em; font-size: 0.8em; }
-p.tremark { margin-left: 2em; font-size: 0.8em; }
-
-/* Tables - Minimal three-line style */
-.pyreball-table-wrapper, .pyreball-code-wrapper {
-  width: 100%;
-  margin: 30px 0;
-}
-
-.pyreball-table-wrapper table {
-  width: 100%;
-  border-collapse: collapse;
-  border-top: 2px solid #000000;
-  border-bottom: 2px solid #000000;
-}
-
-.pyreball-table-wrapper th {
-  color: #000000;
-  font-weight: 700;
-  font-style: normal;
-  padding: 14px 18px;
-  text-align: left;
-  font-family: var(--heading-font);
-  font-size: 14px;
-  border-bottom: 2px solid #000000;
-}
-
-.pyreball-table-wrapper td {
-  padding: 12px 18px;
-  color: #000000;
-  font-size: 13px;
-  font-style: normal;
-}
-
-/* Hide index column */
-.pyreball-table-wrapper td:first-child,
-.pyreball-table-wrapper th:first-child {
-  display: none;
-}
-
-/* Table captions - Non-italic, Black Color */
-.pyreball-table-wrapper table caption,
-table caption,
-caption,
-.table-caption,
-.pyreball-table-wrapper .table-title,
-.pyreball-table-wrapper .dataTables_wrapper .table-title,
-.pyreball-table-wrapper .dataTables_wrapper caption {
-  font-style: normal !important;
-  font-weight: 600;
-  text-align: center;
-  padding: 10px 0;
-  margin-bottom: 10px;
-  color: #000000 !important;
-  caption-side: top;
-}
-
-/* DataTables sorting arrows */
-table.dataTable thead .sorting,
-table.dataTable thead .sorting_asc,
-table.dataTable thead .sorting_desc {
-  cursor: pointer;
-  position: relative;
-  padding-right: 26px !important;
-}
-
-table.dataTable thead .sorting:after,
-table.dataTable thead .sorting_asc:after,
-table.dataTable thead .sorting_desc:after {
-  position: absolute;
-  right: 8px;
-  content: "";
-  top: 50%;
-  transform: translateY(-50%);
-  color: #000000;
-}
-
-table.dataTable thead .sorting:after { content: "▲▼"; font-size: 10px; opacity: 0.7; }
-table.dataTable thead .sorting_asc:after { content: "▲"; font-size: 12px; opacity: 1; }
-table.dataTable thead .sorting_desc:after { content: "▼"; font-size: 12px; opacity: 1; }
-
-/* Code Blocks */
-.pyreball-code-wrapper pre {
-  background-color: color-mix(in srgb, var(--accent-color), transparent 96%);
-  border-left: 4px solid var(--accent-color);
-  border-radius: 8px;
-  padding: 25px;
-  overflow-x: auto;
-  font-family: var(--code-font);
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--default-color);
-  box-shadow: 0px 5px 30px 0px rgba(0, 0, 0, 0.08);
-  transition: 0.3s;
-}
-
-.pyreball-code-wrapper pre:hover {
-  box-shadow: 0px 5px 35px 0px rgba(0, 0, 0, 0.12);
-}
-
-.pyreball-code-wrapper code {
-  background-color: transparent;
-  padding: 3px 6px;
-  border-radius: 4px;
-  color: var(--accent-dark);
-  font-size: 13px;
-  font-style: normal;
-}
-
-/* Block Containers */
-.pyreball-block-fit-content { width: fit-content; max-width: 100%; margin: 20px 0; }
-.pyreball-centered { margin: 0 auto; }
-.pyreball-left-aligned { margin: 0 auto 0 0; }
-.pyreball-right-aligned { margin: 0 0 0 auto; }
-
-/* Images and Figures */
-.pyreball-image-wrapper {
-  margin: 30px auto;
-  padding: 15px;
-  background-color: var(--surface-color);
-  border-radius: 4px;
-  border: 1px solid var(--border-light);
-  text-align: center;
-  box-shadow: 0px 3px 15px 0px rgba(0, 0, 0, 0.05);
-  transition: 0.3s;
-}
-
-.pyreball-image-wrapper:hover {
-  box-shadow: 0px 3px 20px 0px rgba(0, 0, 0, 0.08);
-}
-
-img, svg, canvas.marks, div.vega-embed {
-  margin: 0 auto;
-  display: block;
-  max-width: 100%;
-  border-radius: 2px;
-}
-
-/* Image size classifications */
-img.logo { height: 35px; width: 140px; align: left; }
-img.exp { width: 300px; }
-img.exp1 { width: 400px; }
-img.normal { width: 100%; }
-img.normal1 { width: 600px; }
-img.normal2 { width: 200px; }
-img.normal3 { width: 60%; }
-img.normal4 { width: 350px; }
-img.normal5 { width: 75%; }
-img.small { height: 500px; width: 50%; }
-img.small2 { width: 50%; }
-img.small3 { width: 70%; }
-img.small4 { width: 65%; }
-img.small5 { width: 55%; }
-img.small6 { width: 120%; }
-img.floating { width: 450px; }
-img.wid { height: 550px; width: 90%; }
-img.wid2 { width: 700px; }
-
-/* Chart and Figure Titles - Non-italic, Black Color (强化版) */
-figure figcaption,
-figure caption,
-.pyreball-image-wrapper figcaption,
-.pyreball-image-wrapper caption,
-img + p,
-img + div,
-svg + p,
-svg + div,
-canvas + p,
-canvas + div,
-.vega-embed + p,
-.vega-embed + div,
-.vega-embed-wrapper figcaption,
-.vega-embed-wrapper caption,
-.plotly-graph-div + p,
-.plotly-graph-div + div,
-.highcharts-container + p,
-.highcharts-container + div,
-.chart-title,
-.figure-title,
-.plot-title,
-.graph-title,
-.diagram-title,
-.image-caption,
-.figure-caption,
-.table-title,
-.fig-title {
-  font-style: normal !important;
-  color: #000000 !important;
-  text-align: center;
-  font-size: 0.9em;
-  margin-top: 0.5em;
-  margin-bottom: 1.5em;
-  line-height: 1.4;
-  font-weight: 600;
-}
-
-/* 确保所有可能的标题元素都是非斜体黑色 */
-.pyreball-table-wrapper h1,
-.pyreball-table-wrapper h2,
-.pyreball-table-wrapper h3,
-.pyreball-table-wrapper h4,
-.pyreball-table-wrapper h5,
-.pyreball-table-wrapper h6,
-.pyreball-image-wrapper h1,
-.pyreball-image-wrapper h2,
-.pyreball-image-wrapper h3,
-.pyreball-image-wrapper h4,
-.pyreball-image-wrapper h5,
-.pyreball-image-wrapper h6,
-figure h1,
-figure h2,
-figure h3,
-figure h4,
-figure h5,
-figure h6 {
-  font-style: normal !important;
-  color: #000000 !important;
-}
-
-/* 确保图片容器内所有文本都是非斜体 */
-.pyreball-image-wrapper *,
-figure *,
-.pyreball-table-wrapper * {
-  font-style: normal !important;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  body { padding: 10px; }
-  .pyreball-main-container { width: 95% !important; padding: 25px; }
-  h1 { font-size: 26px; }
-  h2 { font-size: 22px; }
-  h3 { font-size: 18px; }
-  .pyreball-table-wrapper th,
-  .pyreball-table-wrapper td { padding: 12px 15px; }
-  .pyreball-code-wrapper pre { padding: 20px; font-size: 13px; }
-}
-
-/* Print Styles */
-@media print {
-  body { background-color: white; padding: 0; }
-  .pyreball-main-container { box-shadow: none; padding: 0; width: 100% !important; }
-  .pyreball-image-wrapper { border: 1px solid #ddd; box-shadow: none; }
-  a[href] { color: black; border-bottom: none; }
-  .pyreball-table-wrapper table { box-shadow: none; border: 1px solid #ddd; }
-  .pyreball-code-wrapper pre { box-shadow: none; border: 1px solid #ddd; background-color: #f9f9f9; }
-  
-  /* 确保打印时图表和表格标题也是黑色非斜体 */
-  figure figcaption,
-  figure caption,
-  .pyreball-image-wrapper figcaption,
-  .pyreball-image-wrapper caption,
-  .pyreball-table-wrapper table caption,
-  table caption,
-  caption {
-    font-style: normal !important;
-    color: #000000 !important;
-  }
-}
-
-/* Animation for Interactive Elements */
-.pyreball-table-wrapper,
-.pyreball-code-wrapper,
-.pyreball-image-wrapper {
-  transition: all 0.3s ease-in-out;
+    opacity: 1;            /* 悬停时显示锚链接 */
 }

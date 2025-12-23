@@ -10,6 +10,7 @@ from pyreball.html import (
     print_h4,
     print_h5,
     print_h6,
+    print_image_selector,
     print_table,
     set_title,
 )
@@ -38,6 +39,7 @@ __all__ = [
     "print_h4",
     "print_h5",
     "print_h6",
+    "print_image_selector",
     "print_table",
     "Reference",
     "set_title",
